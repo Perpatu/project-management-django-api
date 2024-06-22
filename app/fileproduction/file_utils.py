@@ -250,12 +250,12 @@ def tasks_dep_admin(params):
         if status_filter:
             task_query = Task.objects.filter(
                 department=dep_id,
-                end=True
+                end=False
             )
         else:
             task_query = Task.objects.filter(
                 department=dep_id,
-                end=False
+                end=True
             )
 
         tasks = paginate(page_size, page_number, task_query)
