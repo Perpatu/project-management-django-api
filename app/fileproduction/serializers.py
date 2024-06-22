@@ -67,7 +67,7 @@ class FileProductionManageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = FileProduction
-        fields = ['id', 'name', 'file', 'tasks']
+        fields = ['id', 'name', 'file', 'tasks', 'comments']
         read_only_fields = ['id']
 
 
@@ -127,6 +127,7 @@ class TaskManageSerializer(serializers.ModelSerializer):
         model = Task
         fields = '__all__'
         read_only_fields = ['id']
+
 
 class TaskManageSerializerWithDepartment(serializers.ModelSerializer):
     """Serializer for manage tasks logic with department"""
@@ -226,12 +227,23 @@ class TaskSelfSerializer(serializers.ModelSerializer):
         read_only_fields = ['id']
 
 
+class FileProductionDepartmentSerializer(serializers.ModelSerializer):
+    """Serializer for manage file"""
+    comments = CommentFileDisplaySerializer(many=True)
+
+    class Meta:
+        model = FileProduction
+        fields = ['id', 'name', 'file', 'tasks', 'comments']
+        read_only_fields = ['id']
+
+
 class TaskDepartmentSerializer(serializers.ModelSerializer):
     """Serializer for file in department"""
 
-    file = FileProductionManageSerializer(many=False)
+    file = FileProductionDepartmentSerializer(many=False)
     next_task = TaskSelfSerializer(many=False)
     previous_task = TaskSelfSerializer(many=False)
+    manager = UserNestedSerializer(many=False)
 
     class Meta:
         model = Task
@@ -240,28 +252,6 @@ class TaskDepartmentSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         response = super().to_representation(instance)
-        """dep_id = self.context.get('dep_id')
-        departments = [q['department'] for q in response['tasks']]
-        dep_index = departments.index(dep_id)
-
-        filtered_queue = [
-            {
-                **queue_data,
-                'next_task': next((q for q in response['tasks'] if q['department'] > queue_data['department']), 'lack'),
-                'prev_task': next((q for q in response['tasks'] if q['department'] < queue_data['department']), 'lack')
-            }
-            for queue_data in response['tasks']
-            if queue_data['department'] == dep_id
-        ]
-
-        if filtered_queue:
-            dep_index = departments.index(dep_id)
-            if dep_index > 0:
-                filtered_queue[0]['prev_task'] = next((q for q in response['tasks'] if q['department'] == departments[dep_index - 1]), 'lack')
-            if dep_index < len(departments) - 1:
-                filtered_queue[0]['next_task'] = next((q for q in response['tasks'] if q['department'] == departments[dep_index + 1]), 'lack')
-
-        response['tasks'] = filtered_queue"""
         return response
 
 

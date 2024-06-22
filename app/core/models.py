@@ -264,6 +264,7 @@ class Task(models.Model):
         Project,
         on_delete=models.CASCADE
     )
+    manager = models.ForeignKey(User, on_delete=models.CASCADE, blank=False)
     users = models.ManyToManyField(User, related_name='tasks', blank=True)
     planned_start_date = models.DateTimeField(blank=False)
     planned_end_date = models.DateTimeField(blank=False)
